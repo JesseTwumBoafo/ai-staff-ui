@@ -57,6 +57,9 @@
       "artifactName": "YourAIStaff-portable-${version}.exe"
     }
   },
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "devDependencies": {
     "concurrently": "^10.0.3",
     "cross-env": "^7.0.3",
