@@ -9,6 +9,33 @@ const { grantRoot, isWithinGrant } = require('./grants.cjs')
 const isDev = process.env.NODE_ENV === 'development' || process.argv.includes('--dev')
 const DEV_URL = 'http://localhost:5173'
 
+// Auto-update. Releases are published to GitHub Releases (see the publish block
+// in package.json); electron-builder writes the matching app-update.yml into the
+// build, so electron-updater knows where to look without any token. For a public
+// repo this is the free, secret-free path (update.electronjs.org / GitHub). The
+// check runs only in the packaged app: in dev there is nothing to update, and an
+// unpacked run has no app-update.yml. Any failure is swallowed so a flaky update
+// server can never block launch.
+function initAutoUpdate() {
+  if (isDev || !app.isPackaged) return
+  let autoUpdater
+  try {
+    ({ autoUpdater } = require('electron-updater'))
+  } catch {
+    return // electron-updater not bundled (e.g. dev tooling missing); skip quietly
+  }
+  autoUpdater.autoDownload = true
+  autoUpdater.autoInstallOnAppQuit = true
+  autoUpdater.on('error', () => { /* network or update-server failure; ignore */ })
+  // Downloads any newer release in the background and shows a native
+  // notification when it is ready; the update installs on next quit.
+  // checkForUpdatesAndNotify returns a promise that rejects on a failed check
+  // (offline, 404, server error), so the rejection is caught here as well as on
+  // the 'error' event; a flaky update server must never surface as an unhandled
+  // rejection in the main process.
+  Promise.resolve(autoUpdater.checkForUpdatesAndNotify()).catch(() => { /* ignore */ })
+}
+
 // Guardrails for real filesystem access.
 const MAX_ENTRIES = 500
 const MAX_READ_BYTES = 256 * 1024 // 256 KB preview cap
@@ -206,6 +233,7 @@ app.whenReady().then(() => {
   registerFileIpc(() => mainWindow)
   registerAgentIpc()
   createWindow()
+  initAutoUpdate()
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })

@@ -1,0 +1,50 @@
+# Build and publish the Windows desktop app to GitHub Releases on a version tag.
+#
+# Trigger: push a tag of the form vX.Y.Z (e.g. v4.0.0). The job builds the
+# renderer and runs electron-builder, which packages the portable .exe and the
+# NSIS installer and uploads them (plus latest.yml, which electron-updater reads)
+# to a GitHub Release for that tag.
+#
+# Auth: electron-builder publishes using the workflow's built-in GITHUB_TOKEN.
+# No personal token and no secret of any kind is stored in the repo or shipped
+# in the app. The token exists only inside the runner for the life of the job.
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+# Allow the job to create the release and upload assets.
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          # Node 22 LTS: Node 20 reached end of life on 2026-04-30, and Vite 8
+          # requires Node >=20.19 or >=22.12, which a bare "20" pin would not
+          # guarantee. 22 satisfies electron-builder, Vite 8, and Vitest 4.
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build and publish to GitHub Releases
+        run: npm run electron:build -- --publish always
+        env:
+          # electron-builder reads this to authenticate to the GitHub Releases
+          # API. GITHUB_TOKEN is injected automatically by GitHub Actions.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

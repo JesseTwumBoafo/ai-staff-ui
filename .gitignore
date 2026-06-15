@@ -9,8 +9,17 @@ lerna-debug.log*
 
 node_modules
 dist
+dist-single
 dist-ssr
 *.local
+
+# Build artefacts (electron-builder output)
+release
+
+# Secrets and local environment (the app stores provider keys via the OS
+# keychain in userData, not a .env; these lines are belt-and-braces only)
+.env
+.env.*
 
 # Editor directories and files
 .vscode/*

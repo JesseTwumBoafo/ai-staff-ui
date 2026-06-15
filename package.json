@@ -19,6 +19,14 @@
     "directories": {
       "output": "release"
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "REPLACE_WITH_GITHUB_OWNER",
+        "repo": "ai-staff-ui",
+        "releaseType": "release"
+      }
+    ],
     "files": [
       "dist/**",
       "electron/**",
@@ -66,6 +74,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
+    "electron-updater": "^6.8.9",
     "lucide-react": "^1.17.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
