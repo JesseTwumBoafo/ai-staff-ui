@@ -1,7 +1,7 @@
 {
   "name": "ai-staff-ui",
   "private": true,
-  "version": "4.0.0",
+  "version": "0.4.0",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
@@ -22,7 +22,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "REPLACE_WITH_GITHUB_OWNER",
+        "owner": "JesseTwumBoafo",
         "repo": "ai-staff-ui",
         "releaseType": "release"
       }

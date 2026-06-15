@@ -1,6 +1,6 @@
 # Build and publish the Windows desktop app to GitHub Releases on a version tag.
 #
-# Trigger: push a tag of the form vX.Y.Z (e.g. v4.0.0). The job builds the
+# Trigger: push a tag of the form vX.Y.Z (e.g. v0.4.0). The job builds the
 # renderer and runs electron-builder, which packages the portable .exe and the
 # NSIS installer and uploads them (plus latest.yml, which electron-updater reads)
 # to a GitHub Release for that tag.
