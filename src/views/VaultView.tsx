@@ -191,7 +191,7 @@ export function VaultView({ team, onOpenDeploy, onToast, onConnect }: VaultViewP
                 : sessions.map(s => (
                   <button key={s.fileName} className="sidebar-row" onClick={() => openFile(['bkm', 'sessions'], s.fileName, s.fileName)}
                     style={{ width: '100%', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left', padding: '6px 8px', borderRadius: 4 }}>
-                    <span style={{ fontSize: 12, color: 'var(--text-muted)', width: 92, flexShrink: 0 }}>{s.date || '—'}</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)', width: 92, flexShrink: 0 }}>{s.date || 'no date'}</span>
                     <span style={{ fontSize: 13, color: 'var(--text-primary)', flex: 1 }}>{s.title}</span>
                   </button>
                 ))}

@@ -29,7 +29,7 @@ export function OnboardingView({ onboarding, onDismiss, onGoTo, onOpenDeploy, te
       id: 'deploy',
       done: vaultConfigured,
       title: 'Deploy your operating system',
-      description: 'Set up the full operating system (pillars, agent workspace, roster, and ledger) in a folder you choose. Works on this machine or anyone else\'s.',
+      description: 'Set up the full operating system (pillars, agent workspace, roster, and ledger) in a folder you choose. Works on a fresh folder or alongside a vault you already have.',
       action: () => onOpenDeploy?.(),
       actionLabel: 'Deploy now',
     },

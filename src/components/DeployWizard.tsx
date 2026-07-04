@@ -69,7 +69,7 @@ export function DeployWizard({ open, onClose, team, onConnect, onToast, onDeploy
         onToast('Operating system deployed', 'success')
         onDeployed?.()
       } else {
-        onToast('Deploy finished with errors', 'warning')
+        onToast('Deployed with some errors', 'warning')
       }
     } catch (err) {
       setError(String((err as Error)?.message || err))
@@ -212,7 +212,7 @@ export function DeployWizard({ open, onClose, team, onConnect, onToast, onDeploy
               </div>
               <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 12px', lineHeight: 1.6 }}>
                 Created {result.created} item{result.created === 1 ? '' : 's'}, kept {result.kept} that already existed.
-                The folder is now connected, so your team can read and write it.
+                The folder is now connected, so your team can read from and write to it.
               </p>
               {result.errors.length > 0 && (
                 <ul style={{ fontSize: 12, color: 'var(--semantic-error)', margin: '0 0 12px', paddingLeft: 18 }}>
