@@ -4,7 +4,7 @@ A desktop app that runs an AI team on your own machine: you give a brief, an orc
 
 Your AI Staff is an Electron desktop application for anyone who wants to delegate work to a team of AI agents rather than prompt a single chatbot. You assign a brief, the orchestrator routes it to the right specialists, the specialists draft and review each other's work, and the result is shown to you for approval before it lands in a folder. The app runs against your own model providers and your own local folders, so your data and your API spend stay under your control.
 
-This is a pre-1.0 project: expect rough edges and breaking changes before 1.0, and note that only Windows x64 builds are published today. See [Status](#status) for detail.
+This is a pre-1.0 project: expect rough edges and breaking changes before 1.0. Windows x64 builds are published today, and macOS universal (Apple Silicon and Intel) dmg and zip builds are wired into the release pipeline. See [Status](#status) for detail.
 
 ## Features
 
@@ -35,6 +35,12 @@ This is a pre-1.0 project: expect rough edges and breaking changes before 1.0, a
 - Real local folder input and output runs through grant-checked IPC. You pick a folder with the native OS picker, and the app reads and writes only inside folders you have granted, enforced by a grant registry.
 - Reads and writes are scoped, size-capped, and guarded against path traversal.
 
+### Operating system
+
+- Deploy a complete operating system into a folder you choose: the numbered pillars, an agent workspace, a roster seeded from your team, a starter task ledger, SOP stubs, and a drafts-to-reviewed outputs pipeline. Re-running deploy never overwrites anything; it creates only what is missing, so it works on a fresh machine or alongside a vault you already have.
+- An Operating System view reads the deployed vault live from disk: the roster, open tasks, recent session logs, SOPs, and recent outputs, each openable as a preview.
+- Approved runs write a dated session log into the vault and route their deliverables into the outputs pipeline.
+
 ### Shell and quality of life
 
 - A command palette (Cmd+K) jumps to any destination, runs a canned brief, opens a profile, or toggles dark mode.
@@ -50,6 +56,8 @@ Builds are published on the [Releases page](https://github.com/JesseTwumBoafo/ai
 - **Portable**, `YourAIStaff-portable-0.4.0.exe`. Run it directly, with no installation. Good for trying the app without writing to Program Files.
 
 The executables are not yet code-signed, so Windows SmartScreen will warn you on first run. If you trust the source, choose "More info" then "Run anyway".
+
+On macOS, the release pipeline produces a universal (Apple Silicon and Intel) dmg and zip. When a macOS release is available, download the dmg from the Releases page and drag the app to Applications. macOS builds are unsigned at pre-1.0, so Gatekeeper blocks the first launch: open System Settings, then Privacy and Security, and click "Open Anyway" after the app is blocked once. Unsigned macOS builds do not auto-update, so update by downloading a newer dmg.
 
 The app brings no model keys of its own. You supply your own provider API keys, and the app makes no model calls without one.
 
@@ -133,4 +141,4 @@ All rights reserved. The source is published here so the app can be distributed,
 
 ## Status
 
-Pre-1.0. The app works and ships real builds, but interfaces and behaviour can still change before 1.0, and Windows x64 is the only platform published today. Track progress in [ROADMAP.md](ROADMAP.md).
+Pre-1.0. The app works and ships real builds, but interfaces and behaviour can still change before 1.0. Windows x64 builds are published today; macOS universal (Apple Silicon and Intel) dmg and zip builds are wired into the release pipeline and ship from the next tagged release. Real-Mac verification of the macOS build (Gatekeeper flow, window chrome, an agent run) is still pending, since macOS binaries cannot be produced on the Windows dev box. Track progress in [ROADMAP.md](ROADMAP.md).

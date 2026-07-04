@@ -11,6 +11,46 @@ section. Keep entries concrete: scope, files touched, acceptance.
 
 ---
 
+# Operating system deploy, cross-platform, and the Operating System view
+
+Delivered as four stacked feature branches (macOS packaging, deploy engine,
+Operating System view, run write-back). Full grounded design:
+
+`G:\My Drive\8. Agents\ai_team_root\6. Outputs\reviewed\architecture\2026-07-04_os-deploy-crossplatform.md`
+(Archie, QA-passed by Refiloe). Decisions recorded in ADRs 0002 to 0004.
+
+## What shipped
+
+- macOS packaging: universal (Apple Silicon and Intel) dmg and zip, a
+  `macos-latest` CI job, darwin window chrome (native traffic lights via
+  hiddenInset), and a PATH fix so stdio MCP servers spawn from a Finder-launched
+  app. Windows builds unchanged.
+- Deploy engine: pick a folder and scaffold the operating system idempotently
+  (PARA pillars, agent workspace with the deliberate 6-to-8 gap, roster seeded
+  from the app, starter ledger with the real headers, SOP stubs, outputs
+  pipeline). Re-running creates only what is missing.
+- Operating System view: reads the deployed vault live (roster, tasks, sessions,
+  SOPs, outputs), with a roster drift notice and a gated rewrite.
+- Run write-back: an approved run writes a dated session log it owns and routes
+  its deliverable into `6. Outputs/drafts/written`.
+
+## Non-goals (deferred, not dropped)
+
+- In-app promotion pipeline. Deliverables land in `6. Outputs/drafts/written`
+  and stay there; there is no in-app step to move a draft on to reviewed and then
+  final. A deployed user's outputs accumulate in drafts until a promotion surface
+  is built. Deferred deliberately (ADR 0004 and Refiloe's completeness note), not
+  dropped.
+- Code signing and notarisation on macOS, and auto-update for unsigned mac
+  builds. Pre-1.0 ships unsigned; the signing path is config plus secrets when
+  adopted (ADR 0003).
+- Two-way roster sync. The app roster is the source of truth; the vault
+  `team_index.md` is a regenerable mirror behind an explicit click.
+- Claude Code setup on the deployed machine, an environment concern rather than
+  the app's.
+
+---
+
 # Planned: People (lightweight CRM)
 
 This section is the roadmap-altitude summary. The full, grounded design (data
