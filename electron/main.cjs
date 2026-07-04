@@ -4,6 +4,7 @@ const fs = require('fs/promises')
 const fsSync = require('fs')
 const crypto = require('crypto')
 const { registerAgentIpc } = require('./agent.cjs')
+const { registerDeployIpc } = require('./deploy.cjs')
 const { grantRoot, isWithinGrant } = require('./grants.cjs')
 
 const isDev = process.env.NODE_ENV === 'development' || process.argv.includes('--dev')
@@ -240,6 +241,7 @@ app.whenReady().then(() => {
   registerWindowIpc()
   registerFileIpc(() => mainWindow)
   registerAgentIpc()
+  registerDeployIpc()
   createWindow()
   initAutoUpdate()
   app.on('activate', () => {

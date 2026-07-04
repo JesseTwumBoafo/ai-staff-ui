@@ -1,0 +1,31 @@
+{
+  "dirs": [
+    "0. Inbox",
+    "1. Projects",
+    "2. Areas",
+    "3. Resources",
+    "4. Archive",
+    "5. Notes",
+    "6. Reviews",
+    "8. Agents",
+    "8. Agents/ai_team_root",
+    "8. Agents/ai_team_root/bkm",
+    "8. Agents/ai_team_root/bkm/sessions",
+    "8. Agents/ai_team_root/bkm/sops",
+    "8. Agents/ai_team_root/bkm/tasks",
+    "8. Agents/ai_team_root/team",
+    "8. Agents/ai_team_root/6. Outputs",
+    "8. Agents/ai_team_root/6. Outputs/drafts",
+    "8. Agents/ai_team_root/6. Outputs/drafts/written",
+    "8. Agents/ai_team_root/6. Outputs/reviewed"
+  ],
+  "files": [
+    { "path": "0. Inbox/README.md", "src": "inbox_readme.md" },
+    { "path": "8. Agents/ai_team_root/README.md", "src": "agentroot_readme.md" },
+    { "path": "8. Agents/ai_team_root/6. Outputs/README.md", "src": "outputs_readme.md" },
+    { "path": "8. Agents/ai_team_root/bkm/sops/sop_index.md", "src": "sop_index.md" },
+    { "path": "8. Agents/ai_team_root/bkm/sops/orchestration_protocol.md", "src": "orchestration_protocol.md" },
+    { "path": "8. Agents/ai_team_root/team/team_index.md", "src": "team_index.md" },
+    { "path": "8. Agents/ai_team_root/bkm/tasks/open.md", "src": "open.md" }
+  ]
+}
