@@ -27,6 +27,7 @@ export function TitleBar({ currentView }: TitleBarProps) {
   const viewLabels: Record<string, string> = {
     home: 'Activity',
     team: 'Team',
+    vault: 'Operating System',
     profile: 'Team',
     folders: 'Folders',
     onboarding: 'Setup guide',

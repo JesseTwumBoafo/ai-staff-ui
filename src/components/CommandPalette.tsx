@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Search, Home, Users, Folder, Compass, Settings, UserPlus, User, Moon } from 'lucide-react'
+import { Search, Home, Users, Folder, Compass, Settings, UserPlus, User, Moon, Server } from 'lucide-react'
 import type { AppView } from '../data/types'
 import type { Agent } from '../data/types'
 import { CANNED_BRIEFS } from '../data/flows'
@@ -30,6 +30,7 @@ export function CommandPalette({ open, onClose, onNavigate, onViewProfile, onRun
   const navActions: PaletteAction[] = [
     { id: 'nav-home', label: 'Go to Activity', description: 'Brief your team and watch activity', icon: <Home size={14} />, action: () => { onNavigate('home'); onClose() } },
     { id: 'nav-team', label: 'Go to Team', description: 'View your roster', icon: <Users size={14} />, action: () => { onNavigate('team'); onClose() } },
+    { id: 'nav-vault', label: 'Go to Operating System', description: 'Your deployed vault: roster, tasks, sessions', icon: <Server size={14} />, action: () => { onNavigate('vault'); onClose() } },
     { id: 'nav-folders', label: 'Go to Folders', description: 'Manage connected folders', icon: <Folder size={14} />, action: () => { onNavigate('folders'); onClose() } },
     { id: 'nav-onboarding', label: 'Go to Setup guide', description: 'Onboarding checklist', icon: <Compass size={14} />, action: () => { onNavigate('onboarding'); onClose() } },
     { id: 'nav-hire', label: 'Add a specialist', description: 'Browse the hiring library', icon: <UserPlus size={14} />, action: () => { onNavigate('hire'); onClose() } },

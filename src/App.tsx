@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Home, Users, UserPlus, Folder, Compass, Settings, Plug } from 'lucide-react'
+import { Home, Users, UserPlus, Folder, Compass, Settings, Plug, Server } from 'lucide-react'
 import { HomeView } from './views/HomeView'
+import { VaultView } from './views/VaultView'
 import { TeamView } from './views/TeamView'
 import { ProfileView } from './views/ProfileView'
 import { HireView } from './views/HireView'
@@ -21,11 +22,12 @@ import { getStoredNames, storeName, resetStoredNames } from './names'
 import { getStoredFolders, storeFolders } from './folders'
 import { getRuns } from './runs'
 
-type NavView = 'home' | 'team' | 'folders' | 'connections' | 'onboarding' | 'hire' | 'settings'
+type NavView = 'home' | 'team' | 'folders' | 'connections' | 'onboarding' | 'hire' | 'settings' | 'vault'
 
 const NAV_ITEMS: { id: NavView; label: string; Icon: typeof Home }[] = [
   { id: 'home', label: 'Activity', Icon: Home },
   { id: 'team', label: 'Team', Icon: Users },
+  { id: 'vault', label: 'Operating System', Icon: Server },
   { id: 'folders', label: 'Folders', Icon: Folder },
   { id: 'connections', label: 'Connections', Icon: Plug },
 ]
@@ -68,7 +70,7 @@ function loadOnboarding(): OnboardingState {
   return base
 }
 const VIEW_KEY = 'ai-staff-view'
-const STABLE_VIEWS: AppView[] = ['home', 'team', 'folders', 'connections', 'settings', 'onboarding']
+const STABLE_VIEWS: AppView[] = ['home', 'team', 'vault', 'folders', 'connections', 'settings', 'onboarding']
 function initialView(): AppView {
   try {
     const v = localStorage.getItem(VIEW_KEY)
@@ -420,6 +422,19 @@ export default function App() {
       )
     }
 
+    if (view === 'vault') {
+      return (
+        <div>
+          <div className="section-heading">Operating System</div>
+          <div style={{ padding: '4px 12px' }}>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
+              Your deployed vault: roster, tasks, sessions, and outputs, read live from disk.
+            </p>
+          </div>
+        </div>
+      )
+    }
+
     if (view === 'hire') {
       return (
         <div>
@@ -547,6 +562,9 @@ export default function App() {
           )}
           {view === 'team' && (
             <TeamView team={team} onViewProfile={viewProfile} selectedAgentId={profileId} liveAgents={liveAgentSet} onHire={() => navigate('hire')} />
+          )}
+          {view === 'vault' && (
+            <VaultView team={team} onOpenDeploy={() => setDeployOpen(true)} onToast={addToast} onConnect={handleConnectFolder} />
           )}
           {view === 'profile' && profileAgent && (
             <ProfileView
