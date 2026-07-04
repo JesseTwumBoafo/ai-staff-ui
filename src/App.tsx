@@ -8,6 +8,7 @@ import { FoldersView } from './views/FoldersView'
 import { ConnectionsView } from './views/ConnectionsView'
 import { OnboardingView } from './views/OnboardingView'
 import { CommandPalette } from './components/CommandPalette'
+import { DeployWizard } from './components/DeployWizard'
 import { ToastContainer } from './components/Toast'
 import { INITIAL_TEAM } from './data/team'
 import type { Agent, AgentStatus, AppView, FolderAccess, HiringCandidate, OnboardingState } from './data/types'
@@ -90,6 +91,7 @@ export default function App() {
   const [initialFlowId, setInitialFlowId] = useState<string | null>(null)
   const [openRunId, setOpenRunId] = useState<string | null>(null)
   const [runsVersion, setRunsVersion] = useState(0)
+  const [deployOpen, setDeployOpen] = useState(false)
   const [themePref, setThemePref] = useState<ThemePreference>(getStoredTheme)
 
   // Apply theme on mount and when preference changes
@@ -525,6 +527,7 @@ export default function App() {
               onboarding={onboarding}
               onDismiss={handleDismissOnboarding}
               onGoTo={(v) => navigate(v as AppView)}
+              onOpenDeploy={() => setDeployOpen(true)}
               team={team}
             />
           )}
@@ -672,6 +675,15 @@ export default function App() {
         onRunBrief={handleRunBrief}
         onToggleDarkMode={toggleDarkMode}
         team={team}
+      />
+
+      {/* Deploy your operating system */}
+      <DeployWizard
+        open={deployOpen}
+        onClose={() => setDeployOpen(false)}
+        team={team}
+        onConnect={handleConnectFolder}
+        onToast={addToast}
       />
 
       {/* Toasts */}

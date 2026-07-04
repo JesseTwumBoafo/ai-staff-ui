@@ -8,20 +8,31 @@ import type { Agent, OnboardingState } from '../data/types'
 interface OnboardingViewProps {
   onboarding: OnboardingState
   onDismiss: () => void
-  onGoTo: (view: 'home' | 'team' | 'folders' | 'hire' | 'settings') => void
+  onGoTo: (view: 'home' | 'team' | 'folders' | 'hire' | 'settings' | 'vault') => void
+  onOpenDeploy?: () => void
   team?: Agent[]
 }
 
-export function OnboardingView({ onboarding, onDismiss, onGoTo, team = INITIAL_TEAM }: OnboardingViewProps) {
+export function OnboardingView({ onboarding, onDismiss, onGoTo, onOpenDeploy, team = INITIAL_TEAM }: OnboardingViewProps) {
   const nameById = namesFromTeam(team)
   const r = (text: string) => resolveNames(text, nameById)
   const [modelConnected, setModelConnected] = useState(false)
+  const [vaultConfigured, setVaultConfigured] = useState(false)
 
   useEffect(() => {
     window.electronAPI?.configStatus().then(s => setModelConnected(s.ready)).catch(() => {})
+    window.electronAPI?.vaultStatus().then(s => setVaultConfigured(s.configured)).catch(() => {})
   }, [])
 
   const steps = [
+    {
+      id: 'deploy',
+      done: vaultConfigured,
+      title: 'Deploy your operating system',
+      description: 'Set up the full operating system (pillars, agent workspace, roster, and ledger) in a folder you choose. Works on this machine or anyone else\'s.',
+      action: () => onOpenDeploy?.(),
+      actionLabel: 'Deploy now',
+    },
     {
       id: 'folder',
       done: onboarding.folderConnected,
