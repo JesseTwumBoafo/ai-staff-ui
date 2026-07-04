@@ -38,6 +38,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   reviewAndWrite: (brief, draft, folders) => ipcRenderer.invoke('agent:reviewAndWrite', { brief, draft, folders }),
   stopAgent: () => ipcRenderer.invoke('agent:stop'),
   notify: (title, body) => ipcRenderer.invoke('notify', { title, body }),
+
+  // Operating-system deploy and vault pointer.
+  deployPlan: (root) => ipcRenderer.invoke('deploy:plan', { root }),
+  deployApply: (root, ownerName, roster) => ipcRenderer.invoke('deploy:apply', { root, ownerName, roster }),
+  vaultStatus: () => ipcRenderer.invoke('vault:status'),
+  setVaultRoot: (root) => ipcRenderer.invoke('vault:setRoot', { root }),
   onAgentEvent: (cb) => {
     const handler = (_event, payload) => cb(payload)
     ipcRenderer.on('agent:event', handler)

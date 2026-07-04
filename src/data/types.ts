@@ -70,7 +70,56 @@ export interface HiringCandidate {
   defaultFolders: string[]
 }
 
-export type AppView = 'home' | 'team' | 'hire' | 'profile' | 'folders' | 'connections' | 'onboarding' | 'settings'
+export type AppView = 'home' | 'team' | 'hire' | 'profile' | 'folders' | 'connections' | 'onboarding' | 'settings' | 'vault'
+
+// Operating-system deploy and vault-read model. Deploy scaffolds an ICOR-style
+// vault into a chosen folder; the vault types drive the Operating System view.
+export interface DeployEntry {
+  relPath: string
+  kind: 'dir' | 'file'
+  action: 'create' | 'keep'
+}
+export interface DeployPlan {
+  root: string
+  entries: DeployEntry[]
+  warnings: string[]
+}
+export interface DeployResult {
+  ok: boolean
+  created: number
+  kept: number
+  errors: string[]
+}
+export interface VaultStatus {
+  configured: boolean
+  root?: string
+  agentRoot?: string
+  exists: boolean
+  hasTeamIndex: boolean
+  hasLedger: boolean
+  hasSessions: boolean
+}
+export interface VaultRosterRow {
+  name: string
+  role: string
+  lane: string
+  status: string
+  hired: string
+}
+export interface VaultTaskRow {
+  id: string
+  title: string
+  owner: string
+  opened: string
+  due: string
+  status: string
+  notes: string
+}
+export interface VaultSessionRef {
+  fileName: string
+  date: string
+  title: string
+}
 
 export interface OnboardingState {
   dismissed: boolean

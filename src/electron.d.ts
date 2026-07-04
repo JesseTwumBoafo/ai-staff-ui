@@ -1,6 +1,8 @@
 // Shared typings for the Electron preload bridge (window.electronAPI).
 // Implemented in electron/preload.cjs and backed by ipcMain handlers in electron/main.cjs.
 
+import type { DeployPlan, DeployResult, VaultStatus, VaultRosterRow } from './data/types'
+
 export interface FolderEntry {
   name: string
   isDirectory: boolean
@@ -151,6 +153,11 @@ export interface ElectronAPI {
   stopAgent: () => Promise<{ ok: boolean }>
   notify: (title: string, body: string) => Promise<{ ok: boolean }>
   onAgentEvent: (cb: (e: AgentEvent) => void) => () => void
+  // Operating-system deploy and vault pointer
+  deployPlan: (root: string) => Promise<DeployPlan>
+  deployApply: (root: string, ownerName: string, roster: VaultRosterRow[]) => Promise<DeployResult>
+  vaultStatus: () => Promise<VaultStatus>
+  setVaultRoot: (root: string) => Promise<{ ok: boolean; error?: string }>
 }
 
 declare global {
