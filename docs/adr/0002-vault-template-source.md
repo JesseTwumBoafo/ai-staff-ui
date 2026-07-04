@@ -22,7 +22,7 @@ is static text.
   and mirrors the real vault one to one.
 - Option B (simplest viable): generate the whole tree in code as literal strings
   in `deploy.cjs`. Fewer moving parts and no asar considerations, but every
-  content tweak becomes a code change and a forty-file skeleton as string
+  content tweak becomes a code change and a twenty-five-entry skeleton as string
   literals is hard to review.
 
 ## Decision

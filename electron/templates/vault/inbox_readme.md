@@ -1,8 +1,8 @@
 # Inbox
 
 Drop new files here for triage. This is the front door to your operating system:
-anything you are not sure where to file goes here first, and gets routed to the
-right pillar later.
+anything you are not sure where to file goes here first, so you can file it to
+the right pillar later.
 
 The numbered pillars alongside this folder are:
 

@@ -12,5 +12,6 @@ What lives here:
 - `6. Outputs/`: where deliverables land, in a drafts-to-reviewed pipeline.
 
 The app is the live system. These files are readable mirrors and logs that the
-app reads and writes through folder access you have granted. Nothing here is
-edited without an action you take in the app.
+app reads and writes through folder access you have granted. The app never edits
+these files except on an action you take in it; the SOP stubs are yours to edit
+directly.

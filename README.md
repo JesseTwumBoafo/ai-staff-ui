@@ -43,7 +43,7 @@ This is a pre-1.0 project: expect rough edges and breaking changes before 1.0. W
 
 ### Shell and quality of life
 
-- A command palette (Cmd+K) jumps to any destination, runs a canned brief, opens a profile, or toggles dark mode.
+- A command palette (Ctrl+K, or Cmd+K on macOS) jumps to any destination, runs a canned brief, opens a profile, or toggles dark mode.
 - Conversations are saved and resumable; you can reopen a past run with its brief and deliverable intact.
 - Desktop notifications fire when a long-running run finishes while the window is in the background.
 - Light, dark, and system themes are supported, with the system option following your OS preference.
