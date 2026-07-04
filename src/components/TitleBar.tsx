@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react'
 const electronAPI = window.electronAPI
 
 const isElectron = Boolean(electronAPI)
+// On macOS the window keeps its native traffic lights (inset via hiddenInset in
+// main.cjs), so we hide the Windows-style controls and leave the rail clear for
+// the OS-drawn buttons.
+const isMac = isElectron && electronAPI?.platform === 'darwin'
 
 interface TitleBarProps {
   currentView: string
@@ -101,8 +105,9 @@ export function TitleBar({ currentView }: TitleBarProps) {
         )}
       </div>
 
-      {/* Electron only: Windows-style window controls (right side) */}
-      {isElectron && (
+      {/* Electron on Windows/Linux only: custom window controls (right side).
+          macOS uses the native traffic lights, so these are hidden there. */}
+      {isElectron && !isMac && (
         <div style={{
           display: 'flex',
           height: 32,

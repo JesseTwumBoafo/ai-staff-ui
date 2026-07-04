@@ -123,6 +123,8 @@ export interface ConnectedFolder {
 }
 
 export interface ElectronAPI {
+  // Host platform (process.platform: 'darwin' | 'win32' | 'linux' | ...)
+  platform: string
   // Window controls
   minimize: () => void
   toggleMaximize: () => void

@@ -158,12 +158,20 @@ function registerWindowIpc() {
 }
 
 function createWindow() {
+  // Window chrome differs by platform. On Windows the app is fully frameless and
+  // draws its own controls (see TitleBar.tsx). On macOS a frameless window would
+  // drop the native traffic lights, so we keep them and inset them into our
+  // custom title bar with hiddenInset; TitleBar reserves the rail for them.
+  const isMac = process.platform === 'darwin'
+  const chrome = isMac
+    ? { titleBarStyle: 'hiddenInset', trafficLightPosition: { x: 18, y: 10 } }
+    : { frame: false }
   const win = new BrowserWindow({
     width: 1280,
     height: 800,
     minWidth: 960,
     minHeight: 640,
-    frame: false,
+    ...chrome,
     show: false,
     backgroundColor: '#1A1922', // near-black fallback avoids white flash
     webPreferences: {

@@ -1,6 +1,10 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  // Host platform (process.platform), so the renderer can adapt its chrome
+  // (e.g. macOS traffic lights versus Windows-style controls in TitleBar).
+  platform: process.platform,
+
   // Window controls
   minimize: () => ipcRenderer.send('window-minimize'),
   toggleMaximize: () => ipcRenderer.send('window-toggle-maximize'),
