@@ -48,3 +48,34 @@ jobs:
           # electron-builder reads this to authenticate to the GitHub Releases
           # API. GITHUB_TOKEN is injected automatically by GitHub Actions.
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          # Match the Windows job: Node 22 satisfies electron-builder, Vite 8, and
+          # Vitest 4.
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      # Builds the universal (arm64 + x64) dmg and zip and uploads them to the
+      # same GitHub Release as the Windows job. The build is unsigned at pre-1.0
+      # (build.mac.identity is null): Gatekeeper requires the recipient to use
+      # "Open Anyway", and electron-updater will not auto-update unsigned mac
+      # builds. See README for the manual-update note.
+      - name: Build and publish to GitHub Releases
+        run: npm run electron:build:mac -- --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
