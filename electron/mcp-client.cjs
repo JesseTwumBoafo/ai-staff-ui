@@ -28,6 +28,21 @@ function sanitizeKey(name) {
   return String(name || '').replace(/[^a-z0-9]/gi, '_').toLowerCase().replace(/_+/g, '_').replace(/^_|_$/g, '') || 'mcp'
 }
 
+// A macOS app launched from Finder inherits a minimal PATH that omits the
+// Homebrew and local bin directories, so a stdio server configured as `npx ...`
+// or `uvx ...` fails to spawn even though the identical config works on Windows.
+// Append the standard locations (contained and explicit, not a login-shell exec)
+// after any existing entries so a user-declared PATH still wins. No-op off darwin.
+function augmentPathForDarwin(env) {
+  if (process.platform !== 'darwin') return env
+  const extra = ['/opt/homebrew/bin', '/usr/local/bin', '/usr/bin', '/bin']
+  const current = String(env.PATH || '').split(':').filter(Boolean)
+  for (const dir of extra) {
+    if (!current.includes(dir)) current.push(dir)
+  }
+  return { ...env, PATH: current.join(':') }
+}
+
 function transportCandidates(sdk, s) {
   if (s.transport === 'stdio') {
     // Do NOT inherit the full process environment: that would hand every env var
@@ -35,7 +50,7 @@ function transportCandidates(sdk, s) {
     // safe default env (PATH, HOME and platform basics) plus only the variables
     // the server config explicitly declares.
     const base = typeof sdk.getDefaultEnvironment === 'function' ? sdk.getDefaultEnvironment() : {}
-    const env = { ...base, ...(s.env || {}) }
+    const env = augmentPathForDarwin({ ...base, ...(s.env || {}) })
     return [() => new sdk.StdioClientTransport({ command: s.command, args: s.args || [], env })]
   }
   const url = new URL(s.url)
