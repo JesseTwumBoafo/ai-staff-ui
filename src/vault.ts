@@ -104,6 +104,52 @@ export function rosterDrifted(appNames: string[], fileRoster: VaultRosterRow[]):
   return a.some((n, i) => n !== b[i])
 }
 
+// Compose a session-log entry for a completed, approved run, in the live
+// session-log shape (front matter plus Decisions / Actions taken / Tasks opened
+// / Tasks closed). Pure so it is unit-tested; the caller writes it via
+// folders:write into <agentRoot>/bkm/sessions.
+export function buildSessionEntry(params: {
+  runId: string
+  date: string
+  brief: string
+  title: string
+  feed: { agentName?: string; agentId?: string; text: string; type: string }[]
+  deliverablePath?: string
+}): string {
+  const { runId, date, brief, title, feed, deliverablePath } = params
+  const agents = Array.from(new Set(feed.map(s => (s.agentName || s.agentId || '').trim()).filter(Boolean)))
+  const actions = feed
+    .filter(s => s.type === 'read' || s.type === 'write' || s.type === 'complete')
+    .map(s => `- ${s.text}`)
+  if (deliverablePath) actions.push(`- Deliverable written to ${deliverablePath}`)
+  const oneLineBrief = (brief || '').replace(/\s+/g, ' ').trim().slice(0, 300)
+  return [
+    '---',
+    'type: Session Log',
+    `title: ${title || oneLineBrief || 'App run'}`,
+    `date: ${date}`,
+    `agents_involved: ${agents.join(', ') || '(app)'}`,
+    `brief: ${oneLineBrief}`,
+    `run_id: ${runId}`,
+    '---',
+    '',
+    `# App run ${date}`,
+    '',
+    '## Decisions',
+    '- Run approved at the review gate.',
+    '',
+    '## Actions taken',
+    ...(actions.length ? actions : ['- (no file actions recorded)']),
+    '',
+    '## Tasks opened',
+    '- (none)',
+    '',
+    '## Tasks closed',
+    '- (none)',
+    '',
+  ].join('\n')
+}
+
 // Rewrite the roster table in an existing team_index.md, preserving everything
 // else and bumping last_updated. Used by the gated "update vault roster" action.
 export function updateRosterInTeamIndex(existing: string, roster: VaultRosterRow[], date: string): string {

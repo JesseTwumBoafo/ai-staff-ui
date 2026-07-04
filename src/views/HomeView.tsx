@@ -9,6 +9,7 @@ import { resolveNames } from '../names'
 import type { FeedStep, FolderAccess, OnboardingState } from '../data/types'
 import type { AgentEvent, AgentDraft, AgentSummary, TokenUsage, TranscriptEntry } from '../electron'
 import { saveRun, getRuns } from '../runs'
+import { joinPath, buildSessionEntry } from '../vault'
 
 const electronAPI = window.electronAPI
 
@@ -102,7 +103,11 @@ export function HomeView({ onboarding, onFirstBriefGiven, initialFlowId, onClear
   const feedRef = useRef<HTMLDivElement>(null)
   const prevRunningRef = useRef(false)
   const lastDeliverableRef = useRef<string>('')
+  const lastWrittenPathRef = useRef<string>('')
   const runStartRef = useRef<number>(0)
+  // Agent root of the deployed vault, if one is configured. Drives vault-aware
+  // output routing and per-run session write-back.
+  const [vaultAgentRoot, setVaultAgentRoot] = useState<string>('')
 
   function handleStop() {
     electronAPI?.stopAgent()
@@ -126,17 +131,40 @@ export function HomeView({ onboarding, onFirstBriefGiven, initialFlowId, onClear
     })
   }
 
-  // Persist a run once it finishes (last step is the completion line).
+  // Persist a run once it finishes (last step is the completion line). A run only
+  // reaches a 'complete' step on approval, so declining the review gate writes
+  // nothing here.
   useEffect(() => {
     if (prevRunningRef.current && !running && feed.length > 0) {
       const last = feed[feed.length - 1]
       if (last && last.type === 'complete') {
-        saveRun({ title: brief || feed[0]?.text || 'Run', steps: feed, brief, deliverable: lastDeliverableRef.current })
+        const saved = saveRun({ title: brief || feed[0]?.text || 'Run', steps: feed, brief, deliverable: lastDeliverableRef.current })
         onRunSaved?.()
+        writeSessionLog(saved).catch(() => { /* fail soft: session logging is a background nicety */ })
       }
     }
     prevRunningRef.current = running
   }, [running])
+
+  // Write a session-log file for an approved run into the deployed vault, if one
+  // is configured. Fail-soft: a missing sessions folder or an ungranted root
+  // returns an error we swallow rather than surface mid-run.
+  async function writeSessionLog(run: { id: string; title: string; steps: FeedStep[]; brief?: string }) {
+    if (!electronAPI) return
+    const st = await electronAPI.vaultStatus()
+    if (!st.configured || !st.exists || !st.agentRoot) return
+    const date = new Date().toISOString().slice(0, 10)
+    const content = buildSessionEntry({
+      runId: run.id,
+      date,
+      brief: run.brief || '',
+      title: run.title,
+      feed: run.steps,
+      deliverablePath: lastWrittenPathRef.current || undefined,
+    })
+    const name = `${date}_app_run_${run.id.replace(/^run-/, '')}.md`
+    await electronAPI.writeFile(joinPath(st.agentRoot, 'bkm', 'sessions'), name, content)
+  }
 
   // Load a saved run's transcript when asked (read-only).
   useEffect(() => {
@@ -157,6 +185,7 @@ export function HomeView({ onboarding, onFirstBriefGiven, initialFlowId, onClear
   useEffect(() => {
     if (electronAPI) {
       electronAPI.configStatus().then(s => setAgentReady(s.ready)).catch(() => {})
+      electronAPI.vaultStatus().then(s => setVaultAgentRoot(s.configured && s.exists && s.agentRoot ? s.agentRoot : '')).catch(() => {})
     }
   }, [])
 
@@ -172,7 +201,15 @@ export function HomeView({ onboarding, onFirstBriefGiven, initialFlowId, onClear
   // Connected folders this run can actually read from / write to.
   const connectedFolders = folders.filter(f => f.connected)
   const readFolder = connectedFolders.find(f => f.path) ?? connectedFolders[0]
-  const writeFolder = connectedFolders.find(f => f.path && f.permission === 'read-write')
+  // Vault-aware output routing: when a vault is configured, PREPEND a synthetic
+  // Outputs folder pointing at the drafts pipeline. agent:reviewAndWrite writes to
+  // the FIRST read-write folder, so prepending (not appending) makes deliverables
+  // land in the vault's 6. Outputs/drafts/written.
+  const outputsFolder: FolderAccess | null = vaultAgentRoot
+    ? { name: 'Outputs', path: joinPath(vaultAgentRoot, '6. Outputs', 'drafts', 'written'), permission: 'read-write', connected: true }
+    : null
+  const writeFolders = outputsFolder ? [outputsFolder, ...connectedFolders] : connectedFolders
+  const writeFolder = writeFolders.find(f => f.path && f.permission === 'read-write')
 
   // For a 'read' step, list the real folder and append what was found.
   async function augmentStep(step: Omit<FeedStep, 'id' | 'timestamp'>): Promise<Omit<FeedStep, 'id' | 'timestamp'>> {
@@ -199,6 +236,7 @@ export function HomeView({ onboarding, onFirstBriefGiven, initialFlowId, onClear
     const fileName = `${slugify(brief) || 'ai-staff-output'}.md`
     const res = await electronAPI.writeFile(writeFolder.path, fileName, buildOutputContent(brief, nameById))
     if (res.ok && res.path) {
+      lastWrittenPathRef.current = res.path
       return `Done. Saved ${fileName} to your ${writeFolder.name} folder (${res.path}).`
     }
     return `Done, but I could not write to ${writeFolder.name}: ${res.error ?? 'unknown error'}.`
@@ -352,9 +390,10 @@ export function HomeView({ onboarding, onFirstBriefGiven, initialFlowId, onClear
     setReviewGateData(null)
     setStoppable(true)
     const unsub = electronAPI.onAgentEvent(handleAgentEvent)
-    const res = await electronAPI.reviewAndWrite(brief, draft, connectedFolders)
+    const res = await electronAPI.reviewAndWrite(brief, draft, writeFolders)
     unsub()
     lastDeliverableRef.current = res.finalContent ?? draft.content
+    lastWrittenPathRef.current = res.written?.path ?? ''
     setPendingDraft(null)
     setRunning(false)
     setStoppable(false)

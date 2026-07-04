@@ -6,6 +6,7 @@ import {
   joinPath,
   rosterDrifted,
   updateRosterInTeamIndex,
+  buildSessionEntry,
 } from '../vault'
 
 const TEAM_INDEX = `---
@@ -97,6 +98,34 @@ describe('rosterDrifted', () => {
     const file = parseTeamIndex(TEAM_INDEX)
     expect(rosterDrifted(['Nadia', 'Callum'], file)).toBe(false)
     expect(rosterDrifted(['Nadia', 'Callum', 'Sasha'], file)).toBe(true)
+  })
+})
+
+describe('buildSessionEntry', () => {
+  const entry = buildSessionEntry({
+    runId: 'run-123',
+    date: '2026-07-04',
+    brief: 'Summarise the Q2 review',
+    title: 'Summarise the Q2 review',
+    feed: [
+      { agentName: 'Nadia', text: 'Routing to the writer.', type: 'routing' },
+      { agentName: 'Callum', text: 'Reading the folder.', type: 'read' },
+      { agentName: 'Nadia', text: 'Done. Saved the file.', type: 'complete' },
+    ],
+    deliverablePath: '/vault/8. Agents/ai_team_root/6. Outputs/drafts/written/q2.md',
+  })
+  it('uses the live session-log shape', () => {
+    expect(entry).toContain('type: Session Log')
+    expect(entry).toContain('## Decisions')
+    expect(entry).toContain('## Actions taken')
+    expect(entry).toContain('## Tasks opened')
+    expect(entry).toContain('## Tasks closed')
+  })
+  it('lists involved agents and the deliverable path, not routing-only steps', () => {
+    expect(entry).toContain('agents_involved: Nadia, Callum')
+    expect(entry).toContain('- Deliverable written to /vault/8. Agents/ai_team_root/6. Outputs/drafts/written/q2.md')
+    expect(entry).toContain('- Reading the folder.')
+    expect(entry).not.toContain('- Routing to the writer.')
   })
 })
 
