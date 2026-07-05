@@ -74,7 +74,8 @@
       ],
       "icon": "resources/icon.png",
       "category": "public.app-category.productivity",
-      "identity": null
+      "identity": null,
+      "x64ArchFiles": "**/*.node"
     }
   },
   "engines": {
